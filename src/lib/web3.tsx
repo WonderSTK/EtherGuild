@@ -34,6 +34,7 @@ export const config = defaultWagmiConfig({
   chains,
   projectId,
   metadata,
+  autoConnect: false,
 })
 
 // 3. Create modal
