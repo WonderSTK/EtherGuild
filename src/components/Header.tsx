@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Wallet, Menu, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useWallet } from "@/hooks/useWallet";
 import {
@@ -13,7 +13,21 @@ import {
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isConnected, connect, disconnect, displayName, isConnecting } = useWallet();
+  const { isConnected, connect, disconnect, displayName, isConnecting: isConnectingFromHook } = useWallet();
+  const [isConnectingLocal, setIsConnectingLocal] = useState(false);
+
+  useEffect(() => {
+    if (isConnectingFromHook) {
+      setIsConnectingLocal(true);
+    } else {
+      setIsConnectingLocal(false);
+    }
+  }, [isConnectingFromHook]);
+
+  const handleConnect = () => {
+    setIsConnectingLocal(true);
+    connect();
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -68,11 +82,11 @@ const Header = () => {
               <Button 
                 variant="wallet" 
                 size="default" 
-                onClick={connect}
-                disabled={isConnecting}
+                onClick={handleConnect}
+                disabled={isConnectingLocal}
               >
                 <Wallet className="w-4 h-4" />
-                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+                {isConnectingLocal ? 'Connecting...' : 'Connect Wallet'}
               </Button>
             )}
           </div>
@@ -109,11 +123,11 @@ const Header = () => {
                   variant="wallet" 
                   size="default" 
                   className="mt-4 w-full"
-                  onClick={connect}
-                  disabled={isConnecting}
+                  onClick={handleConnect}
+                  disabled={isConnectingLocal}
                 >
                   <Wallet className="w-4 h-4" />
-                  {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+                  {isConnectingLocal ? 'Connecting...' : 'Connect Wallet'}
                 </Button>
               )}
             </nav>
