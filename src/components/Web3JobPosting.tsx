@@ -7,14 +7,16 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { useJobBoardContract } from '@/hooks/useJobBoardContract'
+import { parseEther } from 'viem'
 
 export function Web3JobPosting() {
   const { address, isConnected } = useAccount()
-  const { postJob, isLoading, isSuccess } = useJobBoardContract()
+  const { postJob, isLoading } = useJobBoardContract()
   const { toast } = useToast()
   
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [payment, setPayment] = useState('') // Payment in ETH
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,23 +30,26 @@ export function Web3JobPosting() {
       return
     }
 
-    if (!title.trim() || !description.trim()) {
+    if (!title.trim() || !description.trim() || !payment.trim()) {
       toast({
         title: "Missing information",
-        description: "Please fill in both title and description.",
+        description: "Please fill in title, description, and payment.",
         variant: "destructive",
       })
       return
     }
 
+    const paymentInWei = parseEther(payment)
+
     try {
-      await postJob(title, description)
+      await postJob(title, description, paymentInWei)
       toast({
         title: "Job posted successfully!",
         description: "Your job has been posted to the blockchain.",
       })
       setTitle('')
       setDescription('')
+      setPayment('')
     } catch (error) {
       toast({
         title: "Error posting job",
@@ -72,7 +77,7 @@ export function Web3JobPosting() {
             <Label htmlFor="job-title">Job Title</Label>
             <Input
               id="job-title"
-              placeholder="e.g. Senior React Developer"
+              placeholder="e.g. Senior Solidity Developer"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               disabled={!isConnected || isLoading}
@@ -87,6 +92,19 @@ export function Web3JobPosting() {
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              disabled={!isConnected || isLoading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="job-payment">Payment (in ETH)</Label>
+            <Input
+              id="job-payment"
+              placeholder="e.g. 0.5"
+              type="number"
+              step="0.01"
+              value={payment}
+              onChange={(e) => setPayment(e.target.value)}
               disabled={!isConnected || isLoading}
             />
           </div>
