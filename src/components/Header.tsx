@@ -13,19 +13,9 @@ import {
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isConnected, connect, disconnect, displayName, isConnecting: isConnectingFromHook } = useWallet();
-  const [isConnectingLocal, setIsConnectingLocal] = useState(false);
-
-  useEffect(() => {
-    if (isConnectingFromHook) {
-      setIsConnectingLocal(true);
-    } else {
-      setIsConnectingLocal(false);
-    }
-  }, [isConnectingFromHook]);
+  const { isConnected, connect, disconnect, displayName, isConnecting } = useWallet();
 
   const handleConnect = () => {
-    setIsConnectingLocal(true);
     connect();
   }
 
@@ -83,10 +73,10 @@ const Header = () => {
                 variant="wallet" 
                 size="default" 
                 onClick={handleConnect}
-                disabled={isConnectingLocal}
+                disabled={isConnecting}
               >
                 <Wallet className="w-4 h-4" />
-                {isConnectingLocal ? 'Connecting...' : 'Connect Wallet'}
+                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
               </Button>
             )}
           </div>
@@ -124,10 +114,10 @@ const Header = () => {
                   size="default" 
                   className="mt-4 w-full"
                   onClick={handleConnect}
-                  disabled={isConnectingLocal}
+                  disabled={isConnecting}
                 >
                   <Wallet className="w-4 h-4" />
-                  {isConnectingLocal ? 'Connecting...' : 'Connect Wallet'}
+                  {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                 </Button>
               )}
             </nav>
